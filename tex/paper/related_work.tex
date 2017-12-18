@@ -1,0 +1,6 @@
+\section{Related Work}
+The traditional method of handling uninformative features is weighted $k$-means \cite{weighted}. By assigning a weight to each feature, uninformative features won't play as large of a role in the cluster distance calculation, which can lead to improved performance. Unfortunately, this is not usually feasible since it requires domain knowledge at the feature level, which often doesn't exist. Furthermore, it does little in the face of noisy data.
+
+The use of autoencoders to improve clustering performance has a reasonable body of prior work. Most relevant to this work is the work done by Xie et al. \cite{deepcluster}. They jointly trained a deep autoencoder and optimized a clustering objective to improve clustering of textual and image data. However, unlike my work, they used gradient descent to optimize KL-divergence for clustering.  
+
+Tian et al. used autoencoders to improve the performance of graph clustering \cite{graph}. Coates et al.  showed that autoencoders can be an effective method of extracting features from image data \cite{coates}. They also demonstrated that $k$-means could successively cluster images, however, the two were not used together. Finally, Dilokthanakul et al. used variational autoencoders to improve clustering using Gaussian mixture models \cite{gmm}.

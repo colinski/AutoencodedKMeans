@@ -1,0 +1,66 @@
+\documentclass[10pt,twocolumn]{article}
+\usepackage[margin=1in]{geometry}
+\usepackage{amsmath}
+\usepackage{amssymb}
+\usepackage{graphicx}
+\usepackage{parskip}
+\usepackage{float}
+\usepackage{titlesec}
+\usepackage{subcaption}
+\title{\vspace{-15mm}Deep autoencoder-assisted clustering in noisy, high dimensional feature spaces}
+\author{Colin Samplawski}
+\date{CS689 Project Proposal - Fall 2017}
+\begin{document}
+%\maketitle
+\begin{center}
+	{\large \textbf{Deep autoencoder-assisted clustering in noisy, high dimensional feature spaces}}\\
+	Colin Samplawski\\
+	CS689 Project Proposal - Fall 2017
+\end{center}
+%The workhorse of clustering methods in practice is the  algorithm [cite], which learns k centroids in the data which define the clusters. A data point is considered in the cluster which it is closest to. 
+\section{Introduction and Problem} \vspace{-5mm}
+Clustering of data is one of the fundamental tasks in machine learning. However, clustering can be problematic in high dimensional feature spaces because every feature contributes equally to the cluster distance calculation. This can reduce clustering performance in high dimensional feature spaces because often some of the features are not informative \cite{highdimensional}. Furthermore, clustering performance can be further degraded in the presence of noisy data \cite{noisecluster}. For this project, I propose an extension of $k$-means clustering using deep autoencoders which will attempt to solve these two problems simultaneously, in a purely unsupervised fashion.
+
+\vspace{-5mm} \section{Autoencoders} \vspace{-5mm}
+An \textit{autoencoder} is a type of neural network which is trained to output its input. The most basic form of autoencoder is simply a feedforward neural network with one hidden layer and the number of inputs equal to the number of outputs. If we set the size of the hidden layer to be smaller than the input size, we learn a smaller dimensional encoding of the input which implicitly performs feature selection \cite{noiseae}. This is known as an \textit{undercomplete autoencoder} \cite{DLBook}. This can be expanded into a \textit{deep autoencoder} which has multiple hidden layers of progressively smaller size. Using autoencoders, we can generate smaller dimensional representations which can then be used in other tasks, such as clustering. 
+%This could be achieved with other feature selection methods, such principle component analysis (PCA), but these methods have no clear way to handle noise in the data.
+
+Autoencoders have also been shown to be able to denoise data \cite{noiseae}. For each sample $x$ a  \textit{denoising autoencoder}  is given a corrupted version $\tilde{x}$ and learns to output the true $x$. In this project, I will train an autoencoder to simultaneously reduce the feature dimension and denoise the data for clustering, in the hopes of improving performance on both axises.
+
+Recent work in the computer vision literature has explored the idea of ``deconvolutional networks" \cite{chairs}\cite{gan}\cite{decon}. In this work, after a series of convolutional operations, a deconvolutional operation is applied which maps the representation back into a higher dimensional space. This idea can naturally be expanded into a \textit{convolutional autoencoder}, which consists of a series of convolutional layers followed by an equal number of deconvolutional layers. There has been limited work with these types of autoencoders and to the best of my knowledge, they have not been used in a clustering domain.
+
+\vspace{-5mm} \section{Experiments,  Datasets, and Methodology} \vspace{-5mm}
+The experiments for this project will use datasets consisting of images. Image datasets work well because they have many features, noise can be artificially added easily, and they are well suited for convolutional operations. In particular, I will use the MNIST\footnote{\texttt{http://yann.lecun.com/exdb/mnist/}} and CIFAR10\footnote{\texttt{https://cs.toronto.edu/\textasciitilde kriz/cifar.html}} datasets. Both data sets contain images of one of 10 classes. MNIST has grayscale images of handwritten digits, 0-9, and CIFAR has color images from 10 types of objects, such as, cats, birds, and cars. I  plan to conduct the following experiments:
+\begin{enumerate}
+	\item Feature selection experiments: Here I will use an autoencoder to produce lower-dimensional representations using non-noisy data. I will investigate representation dimension and compare a standard autoencoder to a deep autoencoder.
+	\item Joint experiments: Here I will train an autoencoder to reduce dimension and noise simultaneously. 
+	\item Convulsional experiments: Here I will design and implement a convolutional autoencoder for dimension reduction. Denoising will likely not be included.
+\end{enumerate} 
+For all these experiments, after learning a smaller dimensional representation, I will use those representations as input to the standard $k$-means algorithm.  I will judge performance mainly using the metric of cluster purity. Cluster purity is defined as: $\frac{1}{N} \sum_i \max_{j} c_{ij}$, where $i$ is cluster index, $j$ is the index of the ground truth class, and $c_{ij}$ is the number of data points of class $j$ assigned to cluster $i$. Essentially, we say that a point is correctly classified if it appears in a cluster whose majority class is the correct class for the point. Note that the ground truth labels are \textit{not} used in learning at any stage. 
+
+All autoencoders will be implemented in TensorFlow in order to use GPUs. The $k$-means algorithm available in SkLearn will be used.
+
+\pagebreak
+\vspace{-5mm} \section{Related Work} \vspace{-5mm}
+Traditionally, weighted $k$-means has been used to handle clustering in high dimensions \cite{weighted}. By assigning each feature a weight, low information features can be excluded. However, this approach is often intractable because usually weights are assigned ahead of time, requiring outside knowledge of the domain.  
+
+As already discussed, autoencoders have been shown to be capable of feature selection and denoising simultaneously \cite{noiseae}. The idea of deconvolution was first explored by researchers at Munich \cite{decon2}. This idea was then applied to train CNNs to generate images of chairs from training data \cite{chairs}. This can be naturally extended into an autoencoder. 
+
+Researchers at Facebook and UW Seattle leveraged deep networks to improve clustering \cite{deepcluster}. They were able to incorporate the neural net training into the clustering algorithm itself. Finally, researchers at Microsoft used autoencoders to improve the performance of graph clustering \cite{graph}.
+
+\vspace{-5mm} \section*{Overlap Statement} \vspace{-5mm}
+This project has no overlap with other work I am currently doing.
+%\begin{figure}
+%	\centering
+%	\caption{Autoencoder architectures}
+%	\begin{minipage}[b]{0.2\textwidth}
+%		\includegraphics[width=\textwidth]{bae.png}
+%	\end{minipage}
+%	\hfill
+%	\begin{minipage}[b]{0.2\textwidth}
+%		\includegraphics[width=\textwidth]{dae.png}
+%	\end{minipage}
+%\end{figure}
+\bibliography{sources.bib}
+\bibliographystyle{ieeetr}
+\end{document}

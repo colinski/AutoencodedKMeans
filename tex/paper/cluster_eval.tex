@@ -1,0 +1,39 @@
+\section{Cluster Evaluation}
+Evaluating clusterings is generally a more difficult task than the case of classification. Fortunately, the datasets I am using have ground truth labels, so we can use metrics which take advantage of that information. I used three commonly used cluster performance metrics to evaluate the clusterings produced by my model. These three were chosen because they share many proprieties. Namely, they all have range [0,1], and they output 0 in the case of random assignments and 1 in the case of perfect clustering. Also, all three are insensitive to the number of clusters used, unlike other metrics, such as cluster purity. All three metrics were calculated using implementations found in scikit-learn's metric package.\footnote{\texttt{http://scikit-learn.org/stable/modules/model\_evaluation.html}} I now provide a brief summary of each metric. Let $D$ be a dataset of $N$ points, $C$ be clusters of points from $D$, and $L$ be the ground truth labels.
+
+\subsection{V-Measure}
+The V-measure (validity measure) is an entropy based clustering metric which measures a clusterings trade-off between homogeneity ($h$) and completeness ($c$). A cluster is homogeneous if it contains points that all are of the same class. A clustering is complete if points from the same class are assigned to the same cluster. They are defined as follows:
+\begin{equation}
+h =
+\begin{cases}
+1 & \text{if } H(L, C) = 0 \\
+1 - \frac{H(L|C)}{H(L)} & \text{else}
+\end{cases}
+\qquad 
+c =
+\begin{cases}
+1 & \text{if } H(C, L) = 0 \\
+1 - \frac{H(C|L)}{H(C)} & \text{else}
+\end{cases}
+\end{equation}  
+where $H$  is information entropy. Note that these components often are opposing, increasing one usually decreases the other.  V-measure is then the harmonic mean of homogeneity and completeness:
+\begin{equation}
+\frac{2 \cdot c \cdot h}{c+h}
+\end{equation}
+In this way, it is somewhat analogous to the F1 measure commonly used in information extraction. A full analysis of V-Measure can be found in \cite{vmeasure}.
+
+\subsection{Normalized Mutual Information}
+Normalized Mutual information (NMI) is an information theoretic metric which is defined as follows:  
+\begin{equation}
+\frac{I(C;L)}{H(C)+H(L)}
+\end{equation}
+where $I(C;L)$ is the mutual information between $C$ and $L$, and $H$ is  again entropy. An in depth discussion of this and other information theoretic metrics can be found in \cite{info}.
+
+\subsection{Rand Score}
+The Rand score, named after William M. Rand, measures the similarity of two partitions of a dataset. The Rand score is defined as:
+\begin{equation}
+\frac{a+b}{\binom{N}{2}}
+\end{equation}
+where $a$ is the number of pairs of points that are in the same subset in $C$ and in the same subset in $L$, and $b$ is the number of pairs of points  that are in different subsets in $C$ and in different subsets in $L$. Note that $\binom{N}{2}$ is the total number of pairs of points in $D$. A full analysis of this metric can be found in \cite{rand}.
+
+

@@ -1,0 +1,21 @@
+\section{Introduction}
+The workhorse method for data clustering is $k$-means. Given a dataset of $N$ points $\{x_1,x_2,\dots, x_N\}$, the algorithm finds $k$ cluster centers $C=\{c_1,c_2,\dots,c_k \}$ which minimize the sum of the distances between each data point and the cluster center that it is closest to. This can be expressed as the following objective:
+\begin{equation}
+\mathcal{L} = \sum_{i=1}^N \min_{c_j \in C} ||x_i - c_j||^2
+\end{equation}
+Since $k$-means uses squared Euclidean distance, all the features of the data contribute equally to the distance calculation. This can be problematic in high dimensional features spaces since some features may be uninformative. Furthermore, it has been shown that $k$-means performs poorly in the presence of noise \cite{noisecluster}. This motivates the addition of an autoencoder.
+
+An autoencoder is a neural network which learns to reproduce its input. In the most basic setting, it consists of a single hidden layer followed by a linear output layer that is equal in size to the input. If we set the hidden layer size to be less than the input size, we can train the autoencoder to produce representations of the data in a smaller dimensional space. This implicitly performs feature selection on the data. The computations of the autoencoder are as follows:
+\begin{equation}
+\begin{aligned}
+h &= f(xW_1 + b_1)\\
+x' &= hW_2 + b_2
+\end{aligned}
+\end{equation}
+where $f$ is a nonlinearity, $W_1,W_2$ are the weights of the network, and $b_1,b_2$ are the biases. We call $x'$ the reconstruction of the input $x$ and $h$ the hidden state. We train to minimize the reconstruction error, given by:
+\begin{equation}
+\sum_{i=1}^N ||x_i - x_i'||^2
+\end{equation}
+Autoencoders have been shown to be an effective way to reduce dimensionality in an unsupervised way \cite{noiseae}. Furthermore, they can be extended to also denoise data. A denoising autoencoder has nearly the same architecture as above, only a noisy version of the input is given at training time. The reconstruction error is then calculated using the clean version of the input. Denoising autoencoders have been shown to be an effective method of denoising data \cite{noiseae}. In this work I provide an architecture which jointly learns a denoising autoencoder and optimizes the $k$-means objective.
+
+The rest of this paper is structured as follows: Section 2 discusses relevant previous work. Section 3 provides a short overview of cluster evaluation metrics. In Section 4 I describe the model architecture. Section 5 discusses experimental design and results.  Section 6 discusses possible future work. Finally, Section 7 concludes.
